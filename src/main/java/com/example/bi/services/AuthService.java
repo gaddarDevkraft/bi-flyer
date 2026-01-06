@@ -54,11 +54,11 @@ public class AuthService {
             Response response = keycloakAdmin.realm(realm).users().create(user);
             log.info("Keycloak user creation response status: {} for realm: {}", response.getStatus(), realm);
 
-//            if (response.getStatus() != HttpStatus.CREATED.value()) {
-//                String errorMessage = response.readEntity(String.class);
-//                log.error("User creation failed in Keycloak: {}", errorMessage);
-//                throw new RuntimeException("User creation failed in Keycloak: " + errorMessage);
-//            }
+            if (response.getStatus() != HttpStatus.CREATED.value()) {
+                String errorMessage = response.readEntity(String.class);
+                log.error("User creation failed in Keycloak: {}", errorMessage);
+                throw new RuntimeException("User creation failed in Keycloak: " + errorMessage);
+            }
 
             userId = CreatedResponseUtil.getCreatedId(response);
             log.info("User created in Keycloak with ID: {}", userId);
@@ -137,7 +137,7 @@ public class AuthService {
                 throw new RuntimeException("User with email " + email + " not found");
             }
 
-            UserRepresentation user = usersList.get(0);
+            UserRepresentation user = usersList.getFirst();
 
             // Send password reset email
             keycloakAdmin.realm(realm)

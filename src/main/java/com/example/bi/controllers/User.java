@@ -20,6 +20,11 @@ public class User {
 
     private final AuthService authService;
 
+    @GetMapping("/test")
+    public ResponseEntity<?> testing(){
+        return ResponseEntity.ok("testing");
+    }
+
     @PostMapping("/signup")
     public ResponseEntity<?> signup(@RequestBody SignUpRequest request) {
         authService.signup(request);
