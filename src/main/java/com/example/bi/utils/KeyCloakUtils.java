@@ -32,6 +32,9 @@ public class KeyCloakUtils {
     @Value("${keyclock.client.secret}")
     private String clientSecret;
 
+    @Value("${keycloak.server-url}")
+    private String serverUrl;
+
     @Autowired
     private Keycloak keycloakAdmin;
 
@@ -40,7 +43,7 @@ public class KeyCloakUtils {
         RestTemplate restTemplate = new RestTemplate();
 
         try {
-            String loginUrl = AppConstant.KEYCLOAK_REALM_AUTH_URL + "/token";
+            String loginUrl = serverUrl+"realms/"+realm+"/protocol/openid-connect/token";
             log.info("keyclock login url : {}", loginUrl);
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
