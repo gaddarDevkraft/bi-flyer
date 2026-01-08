@@ -1,9 +1,13 @@
 package com.example.bi.utils;
 
+
 import com.example.bi.model.BaseResponse;
 import com.example.bi.model.LoginRequestModel;
 import com.example.bi.model.LoginResponseModel;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.keycloak.admin.client.Keycloak;
+import org.keycloak.representations.idm.UserRepresentation;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Component;
@@ -11,8 +15,13 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.List;
+
 @Component
 public class KeyCloakUtils {
+
+    @Value("${keycloak.realm}")
+    private String realm;
 
     @Value("${keyclock.client.id}")
     private String clientId;
@@ -20,12 +29,14 @@ public class KeyCloakUtils {
     @Value("${keyclock.client.secret}")
     private String clientSecret;
 
+    @Autowired
+    private Keycloak keycloakAdmin;
 
-    public BaseResponse<LoginResponseModel> login(LoginRequestModel loginRequestModel){
+    public BaseResponse<LoginResponseModel> login(LoginRequestModel loginRequestModel) {
         BaseResponse<LoginResponseModel> loginResponse = new BaseResponse<>();
         RestTemplate restTemplate = new RestTemplate();
 
-        try{
+        try {
             String loginUrl = AppConstant.KEYCLOAK_REALM_AUTH_URL + "/token";
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
@@ -53,8 +64,33 @@ public class KeyCloakUtils {
                 return new BaseResponse<>(null, HttpStatus.INTERNAL_SERVER_ERROR.value(), "Invalid username or password!");
             }
             return loginResponse;
-        }catch (Exception exception){
+        } catch (Exception exception) {
             return new BaseResponse<>(null, HttpStatus.INTERNAL_SERVER_ERROR.value(), AppConstant.SERVER_ERROR);
         }
     }
+
+    public BaseResponse<String> forgetPassword(String email) {
+        try {
+            System.out.println("forget password start");
+            List<UserRepresentation> users = keycloakAdmin.realm(realm)
+                    .users()
+                    .searchByEmail(email, true);
+            System.out.println("user has find");
+            if (users.isEmpty()) {
+                System.out.println("user not exits");
+                return new BaseResponse<>(null, HttpStatus.BAD_GATEWAY.value(), "user not exit");
+            }
+            System.out.println("start sending the mail");
+            keycloakAdmin.realm(realm)
+                    .users()
+                    .get(users.getFirst().getId())
+                    .executeActionsEmail(List.of("UPDATE_PASSWORD"));
+            System.out.println("mail has send to the user");
+            return new BaseResponse<>(null, HttpStatus.OK.value(), "reset link has been sent");
+
+        } catch (Exception e) {
+            return new BaseResponse<>(null, HttpStatus.BAD_GATEWAY.value(), e.getMessage());
+        }
+    }
+
 }

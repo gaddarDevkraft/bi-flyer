@@ -1,6 +1,7 @@
 package com.example.bi.impl;
 
 import com.example.bi.model.BaseResponse;
+import com.example.bi.model.ForgetPasswordRequest;
 import com.example.bi.model.LoginRequestModel;
 import com.example.bi.model.LoginResponseModel;
 import com.example.bi.services.KeyCloakServices;
@@ -21,6 +22,15 @@ public class KeyCloakImpl implements KeyCloakServices {
         try {
             return keyClockUtil.login(loginRequestModel);
         } catch (Exception e) {
+            return new BaseResponse<>(null, HttpStatus.INTERNAL_SERVER_ERROR.value(), AppConstant.SERVER_ERROR);
+        }
+    }
+
+    @Override
+    public BaseResponse<String> forgetPassword(ForgetPasswordRequest forgetPasswordRequest) {
+        try{
+            return keyClockUtil.forgetPassword(forgetPasswordRequest.getUsername());
+        }catch (Exception e){
             return new BaseResponse<>(null, HttpStatus.INTERNAL_SERVER_ERROR.value(), AppConstant.SERVER_ERROR);
         }
     }
