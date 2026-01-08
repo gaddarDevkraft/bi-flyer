@@ -5,6 +5,7 @@ import com.example.bi.model.BaseResponse;
 import com.example.bi.model.LoginRequestModel;
 import com.example.bi.model.LoginResponseModel;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +17,9 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
+import java.util.logging.Logger;
 
+@Slf4j
 @Component
 public class KeyCloakUtils {
 
@@ -38,6 +41,7 @@ public class KeyCloakUtils {
 
         try {
             String loginUrl = AppConstant.KEYCLOAK_REALM_AUTH_URL + "/token";
+            log.info("keyclock login url : {}", loginUrl);
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
             MultiValueMap<String, Object> map = new LinkedMultiValueMap<>();
@@ -65,7 +69,7 @@ public class KeyCloakUtils {
             }
             return loginResponse;
         } catch (Exception exception) {
-            return new BaseResponse<>(null, HttpStatus.INTERNAL_SERVER_ERROR.value(), AppConstant.SERVER_ERROR);
+            return new BaseResponse<>(null, HttpStatus.INTERNAL_SERVER_ERROR.value(), exception.getMessage());
         }
     }
 

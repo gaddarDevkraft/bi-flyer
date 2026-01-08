@@ -1,7 +1,9 @@
 package com.example.bi.services;
 
 import com.example.bi.entity.BiFlyerUser;
-import com.example.bi.model.SignUpRequest;
+import com.example.bi.entity.Role;
+import com.example.bi.model.SignUpRequestModel;
+import com.example.bi.repo.RoleRepository;
 import com.example.bi.repo.UserRepo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,6 +27,7 @@ import java.util.List;
 public class AuthService {
 
     private final UserRepo userRepository;
+    private final RoleRepository roleRepository;
     private final Keycloak keycloakAdmin;
 
     @Value("${keycloak.realm}")
@@ -34,7 +37,7 @@ public class AuthService {
     private String defaultRole;
 
     @Transactional
-    public void signup(SignUpRequest request) {
+    public void signup(SignUpRequestModel request) {
         log.info("Starting signup process for user: {}", request.getUsername());
 
         // Check if user already exists in database
@@ -48,6 +51,8 @@ public class AuthService {
             UserRepresentation user = new UserRepresentation();
             user.setUsername(request.getUsername());
             user.setEmail(request.getEmail());
+            user.setFirstName(request.getFirstname());
+            user.setLastName(request.getLastname());
             user.setEmailVerified(false);
             user.setEnabled(true);
 
@@ -80,7 +85,7 @@ public class AuthService {
             try{
                 RoleRepresentation role = keycloakAdmin.realm(realm)
                         .roles()
-                        .get("role-user")
+                        .get(request.getRole())
                         .toRepresentation();
 
                 log.info("role is assigned {}", role.getName());
@@ -100,10 +105,16 @@ public class AuthService {
 
             // 4. Save user in database
             BiFlyerUser entity = new BiFlyerUser();
+
+            Role role = roleRepository.findByRoleName(request.getRole())
+                    .orElseThrow(() -> new RuntimeException("Role not found in DB"));
+
             entity.setUserName(request.getUsername());
+            entity.setFirstName(request.getFirstname());
+            entity.setLastName(request.getLastname());
             entity.setEmail(request.getEmail());
             entity.setKeycloakUserId(userId);
-            entity.setRoleAssign("user");
+            entity.setRole(role);
 
             userRepository.save(entity);
             log.info("User saved in database: {}", request.getUsername());

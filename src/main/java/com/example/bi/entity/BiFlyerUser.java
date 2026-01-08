@@ -26,14 +26,24 @@ public class BiFlyerUser {
     @Column(name = "user_name")
     private String userName;
 
+    @Column(name = "first_name")
+    private String firstName;
+
+    @Column(name = "last_name")
+    private String lastName;
+
     @Column(name = "email", unique = true)
     private String email;
 
     @Column(name = "keycloak_user_id", unique = true)
     private String keycloakUserId;
 
-    @Column(name = "role_assign")
-    private String roleAssign;
+    @Column(name = "is_deleted", nullable = false)
+    private Boolean isDeleted = false;
+
+    @ManyToOne
+    @JoinColumn(name = "role_id")
+    private Role role;
 
     @Column(name = "created_at")
     @CreationTimestamp

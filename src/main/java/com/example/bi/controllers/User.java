@@ -1,11 +1,9 @@
 package com.example.bi.controllers;
 
-import com.example.bi.model.SignUpRequest;
+import com.example.bi.model.SignUpRequestModel;
 import com.example.bi.services.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -26,7 +24,7 @@ public class User {
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<?> signup(@RequestBody SignUpRequest request) {
+    public ResponseEntity<?> signup(@RequestBody SignUpRequestModel request) {
         authService.signup(request);
         return ResponseEntity.ok("User registered successfully");
     }

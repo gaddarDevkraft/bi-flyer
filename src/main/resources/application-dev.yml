@@ -1,0 +1,19 @@
+spring:
+  security:
+    oauth2:
+      resource server:
+        jwt:
+          issuer-uri: https://kc-genaiapps.indegene.com/auth/realms/BI-flyer-automation
+          jwk-set-uri: https://kc-genaiapps.indegene.com/auth/realms/BI-flyer-automation/protocol/openid-connect/certs
+
+logging:
+  level:
+    org:
+      springframework:
+        security: DEBUG
+
+jwt:
+  auth:
+    converter:
+      resource-id: client_backend
+      principle-attribute: preferred_username
