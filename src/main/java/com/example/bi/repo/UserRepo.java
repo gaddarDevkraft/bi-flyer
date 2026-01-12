@@ -10,4 +10,5 @@ import java.util.Optional;
 @Repository
 public interface UserRepo extends JpaRepository<BiFlyerUser, Long> {
     Optional<BiFlyerUser> findByEmail(String email);
+    Optional<BiFlyerUser> findByEmailAndIsDeletedFalse(String email);
 }

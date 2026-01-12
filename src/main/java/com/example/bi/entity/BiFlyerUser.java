@@ -35,6 +35,9 @@ public class BiFlyerUser {
     @Column(name = "email", unique = true)
     private String email;
 
+    @Column(name = "password")
+    private String password;
+
     @Column(name = "keycloak_user_id", unique = true)
     private String keycloakUserId;
 
